@@ -1,205 +1,295 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { getAllPosts } from '../data/blog-posts';
+import { FaCalendarAlt, FaClock, FaSearch, FaFilter } from 'react-icons/fa';
 
-// Dữ liệu mẫu cho các bài viết blog
-const blogPosts = [
-  {
-    id: 'tang-tuong-tac-voi-khach-hang-qua-zalo',
-    title: 'Tăng tương tác với khách hàng qua Zalo',
-    excerpt: 'Các chiến lược hiệu quả để tăng tương tác với khách hàng thông qua nền tảng Zalo.',
-    category: 'Marketing',
-    date: '2023-05-15',
-    author: 'Nguyễn Văn A',
-    readTime: '5 phút',
-    image: '/blog1.jpg'
-  },
-  {
-    id: 'cach-quan-ly-du-lieu-khach-hang-hieu-qua',
-    title: 'Cách quản lý dữ liệu khách hàng hiệu quả',
-    excerpt: 'Những phương pháp tối ưu để quản lý cơ sở dữ liệu khách hàng một cách hiệu quả.',
-    category: 'Quản lý',
-    date: '2023-05-10',
-    author: 'Trần Thị B',
-    readTime: '8 phút',
-    image: '/blog2.jpg'
-  },
-  {
-    id: 'tu-dong-hoa-quy-trinh-cham-soc-khach-hang',
-    title: 'Tự động hóa quy trình chăm sóc khách hàng',
-    excerpt: 'Làm thế nào để tự động hóa quy trình chăm sóc khách hàng mà không làm mất đi yếu tố cá nhân hóa.',
-    category: 'Automation',
-    date: '2023-05-05',
-    author: 'Lê Văn C',
-    readTime: '6 phút',
-    image: '/blog3.jpg'
-  },
-  {
-    id: 'phan-tich-du-lieu-khach-hang-voi-zalo-crm',
-    title: 'Phân tích dữ liệu khách hàng với Zalo CRM',
-    excerpt: 'Cách sử dụng các công cụ phân tích dữ liệu trong Zalo CRM để đưa ra quyết định kinh doanh tốt hơn.',
-    category: 'Phân tích',
-    date: '2023-04-28',
-    author: 'Phạm Thị D',
-    readTime: '7 phút',
-    image: '/blog4.jpg'
-  },
-  {
-    id: 'tich-hop-zalo-crm-voi-cac-cong-cu-khac',
-    title: 'Tích hợp Zalo CRM với các công cụ khác',
-    excerpt: 'Hướng dẫn tích hợp Zalo CRM với các công cụ marketing, bán hàng và dịch vụ khách hàng khác.',
-    category: 'Tích hợp',
-    date: '2023-04-20',
-    author: 'Hoàng Văn E',
-    readTime: '10 phút',
-    image: '/blog5.jpg'
-  },
-  {
-    id: 'bao-mat-du-lieu-trong-zalo-crm',
-    title: 'Bảo mật dữ liệu trong Zalo CRM',
-    excerpt: 'Các biện pháp đảm bảo an toàn và bảo mật dữ liệu khách hàng khi sử dụng Zalo CRM.',
-    category: 'Bảo mật',
-    date: '2023-04-15',
-    author: 'Vũ Thị F',
-    readTime: '9 phút',
-    image: '/blog6.jpg'
+export const metadata = {
+  title: 'Blog - Kiến thức quản lý khách hàng với Zalo CRM',
+  description: 'Khám phá bài viết, hướng dẫn và case studies về quản lý khách hàng hiệu quả với Zalo CRM.',
+  keywords: ['blog Zalo CRM', 'hướng dẫn CRM', 'quản lý khách hàng', 'marketing Zalo', 'tự động hóa'],
+  openGraph: {
+    title: 'Blog - Kiến thức quản lý khách hàng với Zalo CRM',
+    description: 'Khám phá bài viết, hướng dẫn và case studies về quản lý khách hàng hiệu quả với Zalo CRM.',
+    url: 'https://zalo-crm.vn/blog',
+    type: 'website',
+    images: [
+      {
+        url: '/images/blog/blog-banner.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Zalo CRM Blog',
+      },
+    ],
   }
-];
+};
 
-// Danh sách các danh mục
-const categories = [
-  'Tất cả',
-  'Marketing',
-  'Quản lý',
-  'Automation',
-  'Phân tích',
-  'Tích hợp',
-  'Bảo mật'
-];
+export default function BlogPage() {
+  const allPosts = getAllPosts();
+  const categories = [...new Set(allPosts.map(post => post.category))];
 
-export default function Blog() {
-  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
-  
-  const filteredPosts = selectedCategory === 'Tất cả'
-    ? blogPosts
-    : blogPosts.filter(post => post.category === selectedCategory);
-  
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
+  // Schema.org cho trang blog
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "headline": "Blog - Kiến thức quản lý khách hàng với Zalo CRM",
+    "description": "Khám phá bài viết, hướng dẫn và case studies về quản lý khách hàng hiệu quả với Zalo CRM.",
+    "url": "https://zalo-crm.vn/blog",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Zalo CRM",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://zalo-crm.vn/logo.png"
       }
-    }
-  };
-  
-  const postVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 }
+    },
+    "blogPost": allPosts.map(post => ({
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "description": post.excerpt,
+      "datePublished": post.date,
+      "url": `https://zalo-crm.vn/blog/${post.slug}`,
+      "author": {
+        "@type": "Person",
+        "name": post.author.name
+      },
+      "keywords": post.tags.join(", ")
+    }))
   };
 
   return (
-    <div className="py-12 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-4">
-            Blog Zalo CRM
-          </h1>
-          <p className="text-lg text-gray-500 max-w-3xl mx-auto">
-            Khám phá các bài viết, mẹo và chiến lược mới nhất để tối ưu hóa việc quản lý khách hàng với Zalo CRM
-          </p>
-        </div>
-        
-        {/* Categories Filter */}
-        <div className="flex flex-wrap justify-center gap-3 mb-10">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
-                selectedCategory === category
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              } transition-colors`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-        
-        {/* Blog Posts */}
-        <motion.div 
-          className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {filteredPosts.map((post) => (
-            <motion.div 
-              key={post.id}
-              className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-              variants={postVariants}
-            >
-              <div className="h-48 bg-gray-300 relative">
-                <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
-                  {post.category}
-                </div>
-              </div>
-              
-              <div className="p-6">
-                <div className="flex items-center text-sm text-gray-500 mb-2">
-                  <span>{post.date}</span>
-                  <span className="mx-2">•</span>
-                  <span>{post.readTime}</span>
-                </div>
-                
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {post.title}
-                </h3>
-                
-                <p className="text-gray-600 mb-4">
-                  {post.excerpt}
-                </p>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">{post.author}</span>
-                  <Link 
-                    href={`/blog/${post.id}`}
-                    className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                  >
-                    Đọc thêm →
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-        
-        {/* Newsletter Signup */}
-        <div className="mt-16 bg-blue-600 rounded-xl p-8 text-center text-white">
-          <h3 className="text-2xl font-bold mb-4">Đăng ký nhận bản tin</h3>
-          <p className="mb-6">Nhận các bài viết mới nhất và mẹo sử dụng Zalo CRM hiệu quả</p>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
+      <div className="py-12 bg-gray-50">
+        {/* Hero/Banner */}
+        <section className="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-20 mb-12 relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-blue-500 filter blur-3xl"></div>
+            <div className="absolute top-1/3 -left-24 w-80 h-80 rounded-full bg-blue-600 filter blur-3xl"></div>
+          </div>
           
-          <form className="max-w-md mx-auto flex gap-2">
-            <input 
-              type="email" 
-              placeholder="Email của bạn" 
-              className="flex-1 px-4 py-2 rounded-l-md text-gray-900 focus:outline-none"
-              required
-            />
-            <button 
-              type="submit"
-              className="bg-white text-blue-600 px-4 py-2 rounded-r-md font-medium hover:bg-gray-100 transition-colors"
-            >
-              Đăng ký
-            </button>
-          </form>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-6">Blog Zalo CRM</h1>
+              <p className="text-xl mb-8 text-blue-100 max-w-3xl mx-auto">
+                Khám phá bài viết, hướng dẫn và case studies về quản lý khách hàng hiệu quả với Zalo CRM
+              </p>
+              
+              {/* Search bar */}
+              <div className="max-w-2xl mx-auto">
+                <div className="flex bg-white rounded-lg shadow-md overflow-hidden p-1">
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm bài viết..."
+                    className="flex-1 px-4 py-2 text-gray-900 focus:outline-none"
+                    aria-label="Tìm kiếm bài viết"
+                  />
+                  <button
+                    type="button"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
+                    aria-label="Tìm kiếm"
+                  >
+                    <FaSearch className="mr-2" />
+                    <span>Tìm kiếm</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Categories */}
+          <section className="mb-12">
+            <div className="flex flex-wrap justify-center gap-4">
+              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                Tất cả
+              </button>
+              {categories.map((category, index) => (
+                <button 
+                  key={index} 
+                  className="bg-white text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100"
+                >
+                  {category}
+                </button>
+              ))}
+              <button className="bg-white text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 flex items-center">
+                <FaFilter className="mr-2" />
+                Lọc thêm
+              </button>
+            </div>
+          </section>
+          
+          {/* Featured Post */}
+          {allPosts.length > 0 && (
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold mb-6 flex items-center">
+                <span className="bg-yellow-400 w-6 h-6 rounded-full mr-2"></span> 
+                Bài viết nổi bật
+              </h2>
+              
+              <article className="bg-white rounded-xl shadow-lg overflow-hidden md:flex">
+                <div className="md:w-1/2 h-64 md:h-auto relative">
+                  {allPosts[0].featuredImage ? (
+                    <Image
+                      src={allPosts[0].featuredImage}
+                      alt={allPosts[0].title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-blue-100"></div>
+                  )}
+                </div>
+                
+                <div className="md:w-1/2 p-8">
+                  <Link 
+                    href={`/blog/${allPosts[0].slug}`} 
+                    className="inline-block bg-blue-600 text-white text-xs font-bold uppercase px-3 py-1 rounded-full mb-4"
+                  >
+                    {allPosts[0].category}
+                  </Link>
+                  
+                  <Link href={`/blog/${allPosts[0].slug}`}>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 hover:text-blue-600 transition duration-300">
+                      {allPosts[0].title}
+                    </h3>
+                  </Link>
+                  
+                  <p className="text-gray-600 mb-6 line-clamp-3">
+                    {allPosts[0].excerpt}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="mr-3 h-10 w-10 rounded-full overflow-hidden relative">
+                        {allPosts[0].author.avatar ? (
+                          <Image
+                            src={allPosts[0].author.avatar}
+                            alt={allPosts[0].author.name}
+                            fill
+                            sizes="40px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold">
+                            {allPosts[0].author.name.charAt(0)}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium">{allPosts[0].author.name}</p>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <FaCalendarAlt className="mr-1" size={12} />
+                          <time dateTime={allPosts[0].date}>{allPosts[0].date}</time>
+                          <span className="mx-2">•</span>
+                          <FaClock className="mr-1" size={12} />
+                          <span>{allPosts[0].readTime}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Link 
+                      href={`/blog/${allPosts[0].slug}`} 
+                      className="text-blue-600 font-bold hover:text-blue-800 flex items-center"
+                    >
+                      Đọc tiếp
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            </section>
+          )}
+          
+          {/* All Posts */}
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold mb-6">Bài viết mới nhất</h2>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {allPosts.map(post => (
+                <article key={post.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+                  <Link href={`/blog/${post.slug}`}>
+                    <div className="h-48 relative">
+                      {post.featuredImage ? (
+                        <Image
+                          src={post.featuredImage}
+                          alt={post.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200"></div>
+                      )}
+                      <div className="absolute top-0 right-0 mt-4 mr-4">
+                        <span className="inline-block bg-blue-600 text-white text-xs px-2 py-1 rounded-md uppercase">
+                          {post.category}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                  
+                  <div className="p-6">
+                    <Link href={`/blog/${post.slug}`}>
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition duration-300">
+                        {post.title}
+                      </h3>
+                    </Link>
+                    
+                    <p className="text-gray-600 mb-4 line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center">
+                        <span>{post.author.name}</span>
+                        <span className="mx-1">•</span>
+                        <span>{post.date}</span>
+                      </div>
+                      <span className="flex items-center text-gray-500">
+                        <FaClock className="mr-1" size={12} />
+                        {post.readTime}
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+          
+          {/* Newsletter Subscription */}
+          <section className="bg-blue-600 rounded-xl p-8 text-center text-white">
+            <h3 className="text-2xl font-bold mb-4">Đăng ký nhận bản tin</h3>
+            <p className="mb-6 max-w-2xl mx-auto">Nhận các bài viết mới nhất và mẹo sử dụng Zalo CRM hiệu quả trực tiếp vào hộp thư của bạn</p>
+            
+            <form className="max-w-md mx-auto flex flex-wrap md:flex-nowrap gap-2">
+              <div className="w-full md:flex-1">
+                <input 
+                  type="email" 
+                  placeholder="Email của bạn" 
+                  aria-label="Email của bạn"
+                  className="w-full px-4 py-3 rounded-md text-gray-900 focus:outline-none"
+                  required
+                />
+              </div>
+              <button 
+                type="submit"
+                className="w-full md:w-auto bg-white text-blue-600 px-6 py-3 rounded-md font-bold hover:bg-blue-50 transition-colors"
+              >
+                Đăng ký
+              </button>
+            </form>
+          </section>
         </div>
       </div>
-    </div>
+    </>
   );
 } 
